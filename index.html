@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIKARNYA — Food Delivery</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body { background:#0b0b0b; color:white; }
+
+.card {
+  background:#181818;
+  border-radius:16px;
+  padding:12px;
+  transition:0.25s;
+}
+.card:hover { transform:scale(1.02); }
+
+.btn {
+  padding:8px 12px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.add { background:#2563eb; }
+.del { background:#ef4444; }
+.buy { background:#22c55e; }
+
+.topbar {
+  position:sticky;
+  top:0;
+  background:#0b0b0b;
+  padding:10px;
+  border-bottom:1px solid #222;
+  z-index:10;
+}
+
+input, textarea {
+  background:#1c1c1c;
+  padding:10px;
+  border-radius:10px;
+  width:100%;
+  margin-top:6px;
+}
+
+/* modal */
+.modal {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-content {
+  background:#141414;
+  padding:20px;
+  border-radius:16px;
+  width:350px;
+}
+
+/* toast */
+.toast {
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#22c55e;
+  padding:10px 14px;
+  border-radius:12px;
+  opacity:0;
+  transition:0.3s;
+}
+.toast.show { opacity:1; }
+
+/* status */
+.status {
+  background:#1c1c1c;
+  padding:10px;
+  border-radius:12px;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <h1 class="text-3xl font-bold">🍕 PIKARNYA DELIVERY</h1>
+</div>
+
+<!-- MENU -->
+<div id="menu" class="grid grid-cols-2 md:grid-cols-3 gap-3 p-3"></div>
+
+<hr class="border-gray-700 my-3">
+
+<!-- CART -->
+<div class="p-3">
+  <h2 class="text-xl">🛒 Корзина</h2>
+  <div id="cart"></div>
+
+  <div class="mt-2">
+    Итого: ₱<span id="total">0</span>
+  </div>
+
+  <button class="btn buy mt-3" onclick="openCheckout()">
+    Оформить заказ
+  </button>
+</div>
+
+<!-- ORDER STATUS -->
+<div class="p-3">
+  <h2 class="text-xl">📦 Статус заказа</h2>
+  <div id="status" class="status">Нет заказа</div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h2 class="text-xl mb-2">Оформление заказа</h2>
+
+    <input id="name" placeholder="Имя">
+    <input id="phone" placeholder="Телефон">
+    <textarea id="address" placeholder="Адрес"></textarea>
+
+    <button class="btn buy w-full mt-3" onclick="pay()">
+      Оплатить ₱<span id="payTotal"></span>
+    </button>
+
+    <button class="btn del w-full mt-2" onclick="closeModal()">
+      Отмена
+    </button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast">OK</div>
+
+<script>
+
+const pizzas = [
+ {name:"Пепперони", price:220},
+ {name:"Мясная BBQ", price:250},
+ {name:"4 сыра", price:260},
+ {name:"Чикен Ранч", price:240},
+ {name:"Острая дьябло", price:245},
+ {name:"Фирменная", price:199},
+];
+
+let cart = [];
+
+function toast(msg){
+  let t = document.getElementById("toast");
+  t.innerText = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),1200);
+}
+
+function addToCart(name, price){
+  cart.push({name, price});
+  toast("Добавлено в корзину");
+  render();
+}
+
+function removeItem(i){
+  cart.splice(i,1);
+  render();
+}
+
+function render(){
+
+  let menu = document.getElementById("menu");
+  menu.innerHTML = "";
+
+  pizzas.forEach(p=>{
+    menu.innerHTML += `
+    <div class="card">
+      <h3 class="font-bold">${p.name}</h3>
+      <p>₱${p.price}</p>
+      <button class="btn add mt-2" onclick="addToCart('${p.name}',${p.price})">
+        Добавить
+      </button>
+    </div>`;
+  });
+
+  let cartDiv = document.getElementById("cart");
+  cartDiv.innerHTML = "";
+
+  let total = 0;
+
+  cart.forEach((c,i)=>{
+    total += c.price;
+
+    cartDiv.innerHTML += `
+    <div class="card flex justify-between mb-2">
+      <span>${c.name} — ₱${c.price}</span>
+      <button class="btn del" onclick="removeItem(${i})">X</button>
+    </div>`;
+  });
+
+  document.getElementById("total").innerText = total;
+}
+
+function openCheckout(){
+  if(cart.length === 0){
+    alert("Корзина пустая");
+    return;
+  }
+
+  document.getElementById("modal").style.display = "flex";
+  document.getElementById("payTotal").innerText =
+    document.getElementById("total").innerText;
+}
+
+function closeModal(){
+  document.getElementById("modal").style.display = "none";
+}
+
+function pay(){
+  let name = document.getElementById("name").value;
+  let phone = document.getElementById("phone").value;
+  let address = document.getElementById("address").value;
+
+  if(!name || !phone || !address){
+    alert("Заполни всё");
+    return;
+  }
+
+  closeModal();
+  toast("Оплата успешна");
+
+  document.getElementById("status").innerText =
+    "🧑‍🍳 Готовим заказ...";
+
+  setTimeout(()=>{
+    document.getElementById("status").innerText =
+      "🚗 Курьер в пути";
+  },2000);
+
+  setTimeout(()=>{
+    document.getElementById("status").innerText =
+      "✅ Доставлено";
+  },5000);
+
+  cart = [];
+  render();
+}
+
+render();
+
+</script>
+
+</body>  
+</html>
