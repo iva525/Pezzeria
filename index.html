@@ -1,255 +1,557 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIKARNYA — Food Delivery</title>
-<script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Пиццерия Рекси и Светланы | Более 50 видов пиццы</title>
+    <!-- Font Awesome 6 (бесплатные иконки) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts: современный шрифт -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.2s ease, border-color 0.2s;
+        }
 
-<style>
-body { background:#0b0b0b; color:white; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            scroll-behavior: smooth;
+        }
 
-.card {
-  background:#181818;
-  border-radius:16px;
-  padding:12px;
-  transition:0.25s;
-}
-.card:hover { transform:scale(1.02); }
+        /* CSS переменные для светлой/тёмной темы */
+        :root {
+            --bg-primary: #fff9f5;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #1e1e2a;
+            --text-secondary: #5a5a6e;
+            --accent: #e35f21;
+            --accent-hover: #c44a12;
+            --border: #f0e4da;
+            --shadow-sm: 0 8px 20px rgba(0,0,0,0.03), 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 12px 28px rgba(0,0,0,0.08);
+            --header-bg: rgba(255, 249, 245, 0.92);
+            --footer-bg: #fef3e8;
+        }
 
-.btn {
-  padding:8px 12px;
-  border-radius:10px;
-  cursor:pointer;
-}
+        body.dark {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e2a;
+            --bg-card: #25262e;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0c0;
+            --accent: #f97316;
+            --accent-hover: #ff8c42;
+            --border: #33333e;
+            --shadow-sm: 0 8px 20px rgba(0,0,0,0.2);
+            --shadow-md: 0 12px 28px rgba(0,0,0,0.3);
+            --header-bg: rgba(18, 18, 24, 0.92);
+            --footer-bg: #1a1a24;
+        }
 
-.add { background:#2563eb; }
-.del { background:#ef4444; }
-.buy { background:#22c55e; }
+        /* Глобальные стили */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
 
-.topbar {
-  position:sticky;
-  top:0;
-  background:#0b0b0b;
-  padding:10px;
-  border-bottom:1px solid #222;
-  z-index:10;
-}
+        section {
+            padding: 5rem 0;
+            scroll-margin-top: 90px;
+        }
 
-input, textarea {
-  background:#1c1c1c;
-  padding:10px;
-  border-radius:10px;
-  width:100%;
-  margin-top:6px;
-}
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+        h2:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 4px;
+        }
 
-/* modal */
-.modal {
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.7);
-  display:none;
-  justify-content:center;
-  align-items:center;
-}
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            background: var(--header-bg);
+            backdrop-filter: blur(16px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+            padding: 0.8rem 0;
+        }
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), #ffb347);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--accent);
+        }
+        .header-actions {
+            display: flex;
+            gap: 1.2rem;
+            align-items: center;
+        }
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.6rem;
+            color: var(--text-primary);
+        }
+        .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -12px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 30px;
+            padding: 0.2rem 0.5rem;
+            min-width: 20px;
+            text-align: center;
+        }
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
 
-.modal-content {
-  background:#141414;
-  padding:20px;
-  border-radius:16px;
-  width:350px;
-}
+        /* Кнопки */
+        .btn-primary {
+            background: var(--accent);
+            border: none;
+            color: white;
+            padding: 0.7rem 1.4rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: scale(0.98);
+        }
 
-/* toast */
-.toast {
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#22c55e;
-  padding:10px 14px;
-  border-radius:12px;
-  opacity:0;
-  transition:0.3s;
-}
-.toast.show { opacity:1; }
+        /* Категории фильтры */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1.5rem 0 2rem;
+        }
+        .filter-chip {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .filter-chip.active, .filter-chip:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 60px;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .search-box i {
+            color: var(--text-secondary);
+        }
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 0.5rem;
+            outline: none;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
 
-/* status */
-.status {
-  background:#1c1c1c;
-  padding:10px;
-  border-radius:12px;
-  margin-top:10px;
-}
-</style>
+        /* Карточки пицц */
+        .pizza-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        .pizza-card {
+            background: var(--bg-card);
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.25s ease;
+            border: 1px solid var(--border);
+        }
+        .pizza-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-md);
+        }
+        .pizza-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .pizza-info {
+            padding: 1.2rem;
+        }
+        .pizza-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        .pizza-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0.5rem 0;
+        }
+        .ingredients {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .price-size {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-top: 0.7rem;
+        }
+        .price {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--accent);
+        }
+        .size {
+            font-size: 0.8rem;
+            background: var(--border);
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+        }
+        .add-to-cart {
+            width: 100%;
+            margin-top: 1rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.6rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Модалка корзины */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1100;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: var(--bg-secondary);
+            max-width: 550px;
+            width: 90%;
+            border-radius: 32px;
+            padding: 1.5rem;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .cart-item-info {
+            flex: 2;
+        }
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .cart-qty-btn {
+            background: var(--border);
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .cart-total {
+            font-weight: 800;
+            font-size: 1.4rem;
+            margin-top: 1rem;
+            text-align: right;
+        }
+
+        /* Акции и прочие блоки */
+        .promo-grid, .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+        .promo-card, .review-card {
+            background: var(--bg-card);
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .faq-item {
+            background: var(--bg-card);
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .faq-question {
+            padding: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            background: var(--bg-secondary);
+        }
+        .faq-answer {
+            padding: 0 1.2rem 1.2rem;
+            display: none;
+            color: var(--text-secondary);
+        }
+        footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            .header-flex {
+                flex-direction: column;
+            }
+            .nav-links {
+                justify-content: center;
+            }
+            section {
+                padding: 3rem 0;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="topbar">
-  <h1 class="text-3xl font-bold">🍕 PIKARNYA DELIVERY</h1>
+<header>
+    <div class="container header-flex">
+        <div class="logo">🍕 Рекси & Светлана</div>
+        <div class="nav-links">
+            <a href="#home" data-nav>🏠 Главная</a>
+            <a href="#menu" data-nav>🍕 Меню</a>
+            <a href="#promotions" data-nav>🔥 Акции</a>
+            <a href="#delivery" data-nav>🚚 Доставка</a>
+            <a href="#reviews" data-nav>⭐ Отзывы</a>
+            <a href="#contacts" data-nav>📞 Контакты</a>
+            <a href="#about" data-nav>🏢 О нас</a>
+            <a href="#faq" data-nav>❓ FAQ</a>
+        </div>
+        <div class="header-actions">
+            <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+            <div class="cart-icon" id="cartIcon">
+                <i class="fas fa-shopping-basket"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- Секция Главная -->
+    <section id="home">
+        <div class="container" style="text-align: center;">
+            <h1 style="font-size: 3rem;">Пицца от Рекси и Светланы</h1>
+            <p style="font-size: 1.2rem; margin: 1rem 0;">Более 50 авторских рецептов ❤️ Только свежие ингредиенты</p>
+            <button class="btn-primary" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">Смотреть меню →</button>
+        </div>
+    </section>
+
+    <!-- Меню + поиск + фильтры -->
+    <section id="menu">
+        <div class="container">
+            <h2>🍕 Наше меню</h2>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Поиск пиццы по названию или составу...">
+            </div>
+            <div class="filter-bar" id="categoriesFilter"></div>
+            <div id="pizzaGridContainer" class="pizza-grid"></div>
+        </div>
+    </section>
+
+    <!-- Акции -->
+    <section id="promotions">
+        <div class="container">
+            <h2>🔥 Горячие акции</h2>
+            <div class="promo-grid">
+                <div class="promo-card"><i class="fas fa-tags" style="color:var(--accent); font-size: 2rem;"></i><h3>Скидка 20% на вторую пиццу</h3><p>При заказе двух пицц от 800₽ — меньшая в подарок со скидкой</p></div>
+                <div class="promo-card"><i class="fas fa-clock" style="color:var(--accent); font-size: 2rem;"></i><h3>Бесплатная доставка</h3><p>При заказе от 1500₽ в пределах города</p></div>
+                <div class="promo-card"><i class="fas fa-gift" style="color:var(--accent); font-size: 2rem;"></i><h3>Счастливые часы</h3><p>Ежедневно 18:00-20:00 — пицца "Маргарита" за 299₽</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Доставка -->
+    <section id="delivery">
+        <div class="container">
+            <h2>🚚 Доставка и оплата</h2>
+            <p>⏱ Время доставки: 35–60 минут. Бесплатно от 1500₽.</p>
+            <p>💰 Оплата: наличными, картой курьеру или онлайн на сайте.</p>
+            <p>📍 Зоны доставки: весь город, пригород до 20 км (надбавка 100₽/км).</p>
+        </div>
+    </section>
+
+    <!-- Отзывы -->
+    <section id="reviews">
+        <div class="container">
+            <h2>⭐ Отзывы наших гостей</h2>
+            <div class="reviews-grid">
+                <div class="review-card">⭐️⭐️⭐️⭐️⭐️ «Лучшая пицца в городе! Тесто нежнейшее, начинки щедрые. Рекси и Светлана — волшебники!» — Анна</div>
+                <div class="review-card">⭐️⭐️⭐️⭐️⭐️ «Очень быстрая доставка, пицца горячая. Огромный выбор — более 50 видов!» — Дмитрий</div>
+                <div class="review-card">⭐️⭐️⭐️⭐️⭐️ «Обожаю их вегетарианскую серию. Советую "Райский сад"» — Елена</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Контакты -->
+    <section id="contacts">
+        <div class="container">
+            <h2>📞 Контакты</h2>
+            <div class="contact-info">
+                <p><i class="fas fa-phone-alt"></i> +7 (999) 123-45-67</p>
+                <p><i class="fas fa-envelope"></i> hello@reksisvetlana.pizza</p>
+                <p><i class="fas fa-map-marker-alt"></i> ул. Пиццерийная, 15, ТЦ "Вкусный мир", 2 этаж</p>
+                <p><i class="fas fa-clock"></i> Ежедневно с 10:00 до 23:00</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- О нас -->
+    <section id="about">
+        <div class="container">
+            <h2>🏢 История Рекси и Светланы</h2>
+            <p>Наша история началась 8 лет назад, когда пёс Рекси и его лучшая подруга Светлана решили объединить любовь к пицце и своему делу. Рекси помогал тестировать рецепты (особенно с мясом), а Светлана внедрила итальянские технологии. Сегодня мы - команда из 25 поваров, 15 курьеров и самого обаятельного пицца-менеджера — Рекси! Каждая пицца создается с душой и секретным ингредиентом — дружбой.</p>
+        </div>
+    </section>
+
+    <!-- FAQ аккордеон -->
+    <section id="faq">
+        <div class="container">
+            <h2>❓ Частые вопросы</h2>
+            <div class="faq-item"><div class="faq-question">Есть ли вегетарианские пиццы? <i class="fas fa-chevron-down"></i></div><div class="faq-answer">Да, более 15 видов на растительном сыре и свежих овощах.</div></div>
+            <div class="faq-item"><div class="faq-question">Можно ли изменить состав пиццы? <i class="fas fa-chevron-down"></i></div><div class="faq-answer">Конечно, в комментарии к заказу укажите пожелания. Мы учтём!</div></div>
+            <div class="faq-item"><div class="faq-question">Как получить скидку по акции? <i class="fas fa-chevron-down"></i></div><div class="faq-answer">Автоматически при оформлении заказа в корзине. Акции суммируются.</div></div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p>🍕 Пиццерия "Рекси и Светлана" — вкус, который вдохновляет © 2025</p>
+</footer>
+
+<!-- Модалка корзины -->
+<div id="cartModal" class="modal">
+    <div class="modal-content">
+        <h3>🍕 Корзина</h3>
+        <div id="cartItemsList"></div>
+        <div class="cart-total" id="cartTotalPrice">Итого: 0 ₽</div>
+        <button id="checkoutBtn" class="btn-primary" style="width:100%; margin-top: 15px;">Оформить заказ</button>
+        <button id="closeModalBtn" style="margin-top: 12px; background: none; border: 1px solid var(--border); border-radius: 40px; padding: 8px; width:100%; cursor:pointer;">Закрыть</button>
+    </div>
 </div>
-
-<!-- MENU -->
-<div id="menu" class="grid grid-cols-2 md:grid-cols-3 gap-3 p-3"></div>
-
-<hr class="border-gray-700 my-3">
-
-<!-- CART -->
-<div class="p-3">
-  <h2 class="text-xl">🛒 Корзина</h2>
-  <div id="cart"></div>
-
-  <div class="mt-2">
-    Итого: ₱<span id="total">0</span>
-  </div>
-
-  <button class="btn buy mt-3" onclick="openCheckout()">
-    Оформить заказ
-  </button>
-</div>
-
-<!-- ORDER STATUS -->
-<div class="p-3">
-  <h2 class="text-xl">📦 Статус заказа</h2>
-  <div id="status" class="status">Нет заказа</div>
-</div>
-
-<!-- CHECKOUT MODAL -->
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <h2 class="text-xl mb-2">Оформление заказа</h2>
-
-    <input id="name" placeholder="Имя">
-    <input id="phone" placeholder="Телефон">
-    <textarea id="address" placeholder="Адрес"></textarea>
-
-    <button class="btn buy w-full mt-3" onclick="pay()">
-      Оплатить ₱<span id="payTotal"></span>
-    </button>
-
-    <button class="btn del w-full mt-2" onclick="closeModal()">
-      Отмена
-    </button>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div id="toast" class="toast">OK</div>
 
 <script>
+    // --------------------------  ГЕНЕРАЦИЯ 52+ ПИЦЦ --------------------------
+    const categories = ["Классические", "Мясные", "Острые", "Вегетарианские", "Морепродукты", "Сладкие"];
+    const pizzaNames = [
+        "Маргарита", "Пепперони", "Гавайская", "Четыре сыра", "Карбонара", "Диабло", "Мясное ассорти", "Вегетарианская", "Морская", "Барбекю",
+        "Тоскана", "Римская", "Капрезе", "Трюфельная", "С грибами", "С курицей и брокколи", "Острая салями", "Флоренция", "Неаполитана", "Кальцоне",
+        "Прошутто", "Рукола", "Дьябла", "Чили-пицца", "Греческая", "Томатная", "Четыре сезона", "Цыпленок карри", "Сырный взрыв", "Пицца-микс",
+        "Мясной король", "Спайси хот", "Пицца с лососем", "Овощной сад", "Грибная поляна", "Беконная", "Пан д'оро", "Сладкая вишня", "Нутелла", "Смородиновая"
+    ];
+    const images = [
+        "https://images.unsplash.com/photo-1594007654729-407eedc4be65?w=300&h=180&fit=crop",
+        "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=300&h=180&fit=crop",
+        "https://images.unsplash.com/photo-1541599545896-d8bdfa48b3ca?w=300&h=180&fit=crop",
+        "https://images.unsplash.com/photo-1571066811602-716837f9db7e?w=300&h=180&fit=crop",
+        "https://images.unsplash.com/photo-1593504049359-74330189a345?w=300&h=180&fit=crop",
+        "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=300&h=180&fit=crop",
+        "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&h=180&fit=crop",
+        "https://images.unsplash.com/photo-1458642849426-cfb724f15ef7?w=300&h=180&fit=crop"
+    ];
 
-const pizzas = [
- {name:"Пепперони", price:220},
- {name:"Мясная BBQ", price:250},
- {name:"4 сыра", price:260},
- {name:"Чикен Ранч", price:240},
- {name:"Острая дьябло", price:245},
- {name:"Фирменная", price:199},
-];
-
-let cart = [];
-
-function toast(msg){
-  let t = document.getElementById("toast");
-  t.innerText = msg;
-  t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),1200);
-}
-
-function addToCart(name, price){
-  cart.push({name, price});
-  toast("Добавлено в корзину");
-  render();
-}
-
-function removeItem(i){
-  cart.splice(i,1);
-  render();
-}
-
-function render(){
-
-  let menu = document.getElementById("menu");
-  menu.innerHTML = "";
-
-  pizzas.forEach(p=>{
-    menu.innerHTML += `
-    <div class="card">
-      <h3 class="font-bold">${p.name}</h3>
-      <p>₱${p.price}</p>
-      <button class="btn add mt-2" onclick="addToCart('${p.name}',${p.price})">
-        Добавить
-      </button>
-    </div>`;
-  });
-
-  let cartDiv = document.getElementById("cart");
-  cartDiv.innerHTML = "";
-
-  let total = 0;
-
-  cart.forEach((c,i)=>{
-    total += c.price;
-
-    cartDiv.innerHTML += `
-    <div class="card flex justify-between mb-2">
-      <span>${c.name} — ₱${c.price}</span>
-      <button class="btn del" onclick="removeItem(${i})">X</button>
-    </div>`;
-  });
-
-  document.getElementById("total").innerText = total;
-}
-
-function openCheckout(){
-  if(cart.length === 0){
-    alert("Корзина пустая");
-    return;
-  }
-
-  document.getElementById("modal").style.display = "flex";
-  document.getElementById("payTotal").innerText =
-    document.getElementById("total").innerText;
-}
-
-function closeModal(){
-  document.getElementById("modal").style.display = "none";
-}
-
-function pay(){
-  let name = document.getElementById("name").value;
-  let phone = document.getElementById("phone").value;
-  let address = document.getElementById("address").value;
-
-  if(!name || !phone || !address){
-    alert("Заполни всё");
-    return;
-  }
-
-  closeModal();
-  toast("Оплата успешна");
-
-  document.getElementById("status").innerText =
-    "🧑‍🍳 Готовим заказ...";
-
-  setTimeout(()=>{
-    document.getElementById("status").innerText =
-      "🚗 Курьер в пути";
-  },2000);
-
-  setTimeout(()=>{
-    document.getElementById("status").innerText =
-      "✅ Доставлено";
-  },5000);
-
-  cart = [];
-  render();
-}
-
-render();
-
-</script>
-
-</body>  
-</html>
+    let pizzas = [];
+    // Создаём 52+ пиццы
+    for (let i = 0; i < 54; i++) {
+        const cat = categories[i % categories.length];
+        let name = pizzaNames[i % pizzaNames.length];
+        if (i > 40) name = name + " " + (i+1); // уникальность
+        const price = Math.floor(Math.random() * (650 - 380 + 1) + 380);
+        const size = (i % 2 === 0) ? "30 см" : "32 см";
+        const ingredientsList = ["моцарелла", "томатный соус", "орегано", "оливковое масло", "базилик"];
+        if (cat === "Мясные") ingredientsList.push("бекон", "курица", "пепперони");
+        if (cat === "Острые") ingredientsList.push("халапеньо", "чили");
+        if (cat === "Морепродукты") ingredientsList.push("креветки", "мидии");
+        if (cat === "Сладкие") ingredientsList.push("нутелла", "клубника");
+        c
